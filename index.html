@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfólio - Pedro Daniel</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Animações Customizadas */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        
+        /* Custom Scrollbar opcional */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    </style>
+</head>
+<body class="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-purple-500/30">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 w-full z-40 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="text-xl font-bold tracking-tighter flex items-center gap-2">
+                <div class="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+                    <span class="text-white text-sm">PD</span>
+                </div>
+                Pedro Daniel
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <button id="btn-lang" class="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-medium">
+                    <i data-lucide="globe" class="w-4 h-4"></i>
+                    <span id="lang-display">PT</span>
+                </button>
+                <button id="btn-admin-toggle" class="text-zinc-400 hover:text-white transition-colors">
+                    <i id="icon-lock" data-lucide="lock" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <main class="pt-32 pb-12 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs text-zinc-400 mb-8 animate-fade-in-up">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span data-i18n="freelance">Available for freelance</span>
+        </div>
+        
+        <h1 data-i18n="heroTitle" class="text-5xl md:text-7xl font-bold tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500">
+            Design que conta histórias.
+        </h1>
+        
+        <p data-i18n="heroSub" class="text-lg md:text-xl text-zinc-400 mb-12 max-w-2xl">
+            Especialista em Thumbnails de alta conversão.
+        </p>
+
+        <a href="#gallery" data-i18n="viewWork" class="px-8 py-4 bg-white text-black rounded-full font-medium hover:scale-105 transition-transform duration-300">
+            Ver Trabalhos
+        </a>
+    </main>
+
+    <!-- FILTERS SECTION -->
+    <section id="filters-container" class="px-6 pb-8 max-w-7xl mx-auto flex flex-wrap justify-center gap-3">
+        <!-- Filtros serão injetados via JS -->
+    </section>
+
+    <!-- GALLERY SECTION -->
+    <section id="gallery" class="px-6 pb-32 max-w-7xl mx-auto min-h-[400px]">
+        <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Thumbnails serão injetadas via JS -->
+        </div>
+        <div id="empty-gallery" class="hidden flex flex-col items-center justify-center py-20 text-zinc-600 border border-dashed border-zinc-800 rounded-2xl">
+            <i data-lucide="image" class="w-12 h-12 mb-4 opacity-50"></i>
+            <p data-i18n="emptyGallery">Nenhuma thumbnail adicionada ainda.</p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-zinc-900 py-12 text-center text-zinc-500 text-sm">
+        <p>© <span id="current-year"></span> Pedro Daniel. All rights reserved.</p>
+    </footer>
+
+    <!-- ADMIN MODAL OVERLAY -->
+    <div id="admin-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col">
+            
+            <button id="btn-close-modal" class="absolute top-4 right-4 text-zinc-400 hover:text-white z-10">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- VIEW: LOGIN -->
+            <div id="view-login" class="flex flex-col gap-4">
+                <div class="flex justify-center mb-2">
+                    <div class="p-3 bg-zinc-800 rounded-full text-zinc-400">
+                        <i data-lucide="lock" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <h2 data-i18n="adminLogin" class="text-2xl font-bold text-center mb-4">Acesso Restrito</h2>
+                
+                <form id="form-login" class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label data-i18n="passwordLabel" class="text-sm text-zinc-400">Senha</label>
+                        <input type="password" id="input-password" class="bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors" placeholder="••••••••">
+                        <span id="login-error" class="text-red-400 text-sm hidden">Senha incorreta.</span>
+                    </div>
+                    <button type="submit" data-i18n="loginBtn" class="bg-white text-black rounded-lg px-4 py-3 font-medium hover:bg-zinc-200 transition-colors mt-2">
+                        Entrar
+                    </button>
+                </form>
+            </div>
+
+            <!-- VIEW: DASHBOARD (ADMIN LOGGED IN) -->
+            <div id="view-dashboard" class="hidden flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 data-i18n="adminPanel" class="text-2xl font-bold">Painel de Controle</h2>
+                    <button id="btn-logout" type="button" data-i18n="logout" class="text-xs text-zinc-500 hover:text-white underline">
+                        Sair
+                    </button>
+                </div>
+
+                <!-- TABS -->
+                <div class="flex bg-zinc-950 p-1 rounded-lg mb-6">
+                    <button id="tab-upload" data-i18n="addThumb" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-zinc-800 text-white">
+                        Adicionar Thumbnail
+                    </button>
+                    <button id="tab-filters" data-i18n="manageFilters" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors text-zinc-500 hover:text-zinc-300">
+                        Gerenciar Filtros
+                    </button>
+                </div>
+
+                <!-- TAB CONTENT: UPLOAD -->
+                <form id="form-upload" class="flex flex-col gap-4 animate-fade-in">
+                    <div class="flex flex-col gap-2">
+                        <label data-i18n="thumbTitle" class="text-sm text-zinc-400">Título da Thumbnail</label>
+                        <input type="text" id="input-title" class="bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors" placeholder="Ex: Gameplay de Minecraft" required>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label data-i18n="selectCategory" class="text-sm text-zinc-400">Categoria da Thumbnail</label>
+                        <select id="select-category" class="bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors appearance-none" required>
+                            <option value="" disabled selected>Selecione uma categoria...</option>
+                            <!-- Injetado via JS -->
+                        </select>
+                        <span id="no-cat-warning" class="hidden text-xs text-amber-500">Adicione categorias primeiro na aba 'Gerenciar Filtros'.</span>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label data-i18n="selectImage" class="text-sm text-zinc-400">Selecionar Imagem</label>
+                        <div class="relative border-2 border-dashed border-zinc-700 hover:border-zinc-500 rounded-xl p-6 flex flex-col items-center justify-center gap-3 transition-colors bg-zinc-950/50 cursor-pointer overflow-hidden min-h-[120px]">
+                            <img id="image-preview" src="" alt="Preview" class="hidden absolute inset-0 w-full h-full object-cover opacity-60">
+                            <div id="image-placeholder" class="flex flex-col items-center">
+                                <i data-lucide="upload-cloud" class="w-6 h-6 text-zinc-500 mb-2"></i>
+                                <span class="text-sm text-zinc-500 text-center">Clique para buscar</span>
+                            </div>
+                            <input type="file" id="input-file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-save-thumb" disabled class="w-full mt-2 px-4 py-3 rounded-lg bg-white text-black font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span data-i18n="save">Salvar</span>
+                    </button>
+                </form>
+
+                <!-- TAB CONTENT: FILTERS -->
+                <div id="form-filters" class="hidden flex flex-col gap-4 animate-fade-in">
+                    <form id="form-add-category" class="flex gap-2">
+                        <input type="text" id="input-category" class="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-purple-500 transition-colors" placeholder="Ex: Minecraft" required>
+                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 rounded-lg transition-colors flex items-center justify-center">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+
+                    <div class="mt-4 bg-zinc-950 rounded-lg border border-zinc-800 p-2 max-h-[200px] overflow-y-auto">
+                        <ul id="admin-category-list" class="flex flex-col gap-1">
+                            <!-- Injetado via JS -->
+                        </ul>
+                        <p id="empty-categories-msg" data-i18n="noCategories" class="hidden text-center text-zinc-600 text-sm py-4">Nenhuma categoria cadastrada.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDCLrDpsrbj_cFfBk3mZ_cvTlrc0XBVt34",
+            authDomain: "portfolio-peu.firebaseapp.com",
+            projectId: "portfolio-peu",
+            storageBucket: "portfolio-peu.firebasestorage.app",
+            messagingSenderId: "1074335993893",
+            appId: "1:1074335993893:web:b95c50ca6fd1fe706defcc",
+            measurementId: "G-N44MVCBDFQ"
+        };
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = "portfolio-peu";
+
+        // --- DICTIONARY (TRANSLATIONS) ---
+        const dict = {
+            pt: {
+                freelance: "Disponível para projetos",
+                heroTitle: "Design que conta histórias.",
+                heroSub: "Especialista em Thumbnails de alta conversão.",
+                viewWork: "Ver Trabalhos",
+                emptyGallery: "Nenhuma thumbnail adicionada ainda.",
+                adminLogin: "Acesso Restrito",
+                passwordLabel: "Senha",
+                loginBtn: "Entrar",
+                adminPanel: "Painel de Controle",
+                addThumb: "Adicionar Thumbnail",
+                manageFilters: "Gerenciar Filtros",
+                thumbTitle: "Título da Thumbnail",
+                selectImage: "Selecionar Imagem",
+                selectCategory: "Categoria da Thumbnail",
+                addCategory: "Novo Filtro / Categoria",
+                save: "Salvar",
+                saving: "Salvando...",
+                cancel: "Cancelar",
+                wrongPassword: "Senha incorreta.",
+                logout: "Sair",
+                allFilter: "Todos",
+                noCategories: "Nenhuma categoria cadastrada."
+            },
+            en: {
+                freelance: "Available for freelance",
+                heroTitle: "Design that tells stories.",
+                heroSub: "High-conversion Thumbnail Specialist.",
+                viewWork: "View Work",
+                emptyGallery: "No thumbnails added yet.",
+                adminLogin: "Restricted Access",
+                passwordLabel: "Password",
+                loginBtn: "Enter",
+                adminPanel: "Control Panel",
+                addThumb: "Add Thumbnail",
+                manageFilters: "Manage Filters",
+                thumbTitle: "Thumbnail Title",
+                selectImage: "Select Image",
+                selectCategory: "Thumbnail Category",
+                addCategory: "New Filter / Category",
+                save: "Save",
+                saving: "Saving...",
+                cancel: "Cancel",
+                wrongPassword: "Wrong password.",
+                logout: "Logout",
+                allFilter: "All",
+                noCategories: "No categories added."
+            }
+        };
+
+        // --- STATE VARIABLES ---
+        let currentLang = 'pt';
+        let currentUser = null;
+        let thumbnails = [];
+        let categories = [];
+        let activeFilter = 'all';
+        let isAdmin = false;
+        let adminTab = 'upload'; // 'upload' or 'filters'
+        let newImageBase64 = '';
+        let isUploading = false;
+
+        // --- DOM ELEMENTS ---
+        const dom = {
+            langBtn: document.getElementById('btn-lang'),
+            langDisplay: document.getElementById('lang-display'),
+            adminToggleBtn: document.getElementById('btn-admin-toggle'),
+            iconLock: document.getElementById('icon-lock'),
+            modal: document.getElementById('admin-modal'),
+            closeModalBtn: document.getElementById('btn-close-modal'),
+            
+            viewLogin: document.getElementById('view-login'),
+            viewDashboard: document.getElementById('view-dashboard'),
+            formLogin: document.getElementById('form-login'),
+            inputPassword: document.getElementById('input-password'),
+            loginError: document.getElementById('login-error'),
+            btnLogout: document.getElementById('btn-logout'),
+            
+            tabUpload: document.getElementById('tab-upload'),
+            tabFilters: document.getElementById('tab-filters'),
+            formUpload: document.getElementById('form-upload'),
+            formFilters: document.getElementById('form-filters'),
+            
+            inputFile: document.getElementById('input-file'),
+            imagePreview: document.getElementById('image-preview'),
+            imagePlaceholder: document.getElementById('image-placeholder'),
+            inputTitle: document.getElementById('input-title'),
+            selectCategory: document.getElementById('select-category'),
+            noCatWarning: document.getElementById('no-cat-warning'),
+            btnSaveThumb: document.getElementById('btn-save-thumb'),
+            
+            formAddCategory: document.getElementById('form-add-category'),
+            inputCategory: document.getElementById('input-category'),
+            adminCategoryList: document.getElementById('admin-category-list'),
+            emptyCategoriesMsg: document.getElementById('empty-categories-msg'),
+            
+            filtersContainer: document.getElementById('filters-container'),
+            galleryContainer: document.getElementById('gallery-container'),
+            emptyGallery: document.getElementById('empty-gallery'),
+            
+            currentYear: document.getElementById('current-year')
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            dom.currentYear.innerText = new Date().getFullYear();
+            
+            // Detect Language
+            const browserLang = navigator.language || navigator.userLanguage;
+            if (browserLang.toLowerCase().includes('en')) {
+                currentLang = 'en';
+            }
+            updateTranslations();
+
+            // Init Firebase Auth
+            initAuth();
+            setupEventListeners();
+        });
+
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth error:", error);
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) setupRealtimeListeners();
+            });
+        };
+
+        const setupRealtimeListeners = () => {
+            if (!currentUser) return;
+
+            const thumbsRef = collection(db, 'artifacts', appId, 'public', 'data', 'thumbnails');
+            onSnapshot(thumbsRef, (snapshot) => {
+                const items = [];
+                snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                thumbnails = items.sort((a, b) => b.createdAt - a.createdAt);
+                renderGallery();
+            }, console.error);
+
+            const catRef = collection(db, 'artifacts', appId, 'public', 'data', 'categories');
+            onSnapshot(catRef, (snapshot) => {
+                const cats = [];
+                snapshot.forEach(doc => cats.push({ id: doc.id, ...doc.data() }));
+                categories = cats.sort((a, b) => a.name.localeCompare(b.name));
+                renderFilters();
+                updateAdminCategorySelect();
+                renderAdminCategoryList();
+            }, console.error);
+        };
+
+        // --- RENDERING UI ---
+        const updateTranslations = () => {
+            dom.langDisplay.innerText = currentLang.toUpperCase();
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[currentLang][key]) {
+                    if (el.children.length > 0 && el.tagName !== 'BUTTON') {
+                         el.innerHTML = dict[currentLang][key];
+                    } else if (el.tagName === 'BUTTON' && el.querySelector('i')) {
+                         const iconHTML = el.querySelector('i').outerHTML;
+                         el.innerHTML = `${iconHTML} <span>${dict[currentLang][key]}</span>`;
+                    } else {
+                         el.innerText = dict[currentLang][key];
+                    }
+                }
+            });
+            lucide.createIcons();
+            renderFilters();
+        };
+
+        const renderFilters = () => {
+            dom.filtersContainer.innerHTML = '';
+            
+            const btnAll = document.createElement('button');
+            const isAllActive = activeFilter === 'all';
+            btnAll.className = `px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isAllActive ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]' : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white border border-zinc-800'}`;
+            btnAll.innerText = dict[currentLang].allFilter;
+            btnAll.onclick = () => { activeFilter = 'all'; renderFilters(); renderGallery(); };
+            dom.filtersContainer.appendChild(btnAll);
+
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                const isActive = activeFilter === cat.name;
+                btn.className = `px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]' : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white border border-zinc-800'}`;
+                btn.innerText = cat.name;
+                btn.onclick = () => { activeFilter = cat.name; renderFilters(); renderGallery(); };
+                dom.filtersContainer.appendChild(btn);
+            });
+        };
+
+        const renderGallery = () => {
+            const filtered = activeFilter === 'all' ? thumbnails : thumbnails.filter(t => t.category === activeFilter);
+            
+            if (filtered.length === 0) {
+                dom.galleryContainer.classList.add('hidden');
+                dom.emptyGallery.classList.remove('hidden');
+                dom.emptyGallery.classList.add('flex');
+            } else {
+                dom.galleryContainer.classList.remove('hidden');
+                dom.emptyGallery.classList.add('hidden');
+                dom.emptyGallery.classList.remove('flex');
+                
+                dom.galleryContainer.innerHTML = filtered.map(thumb => `
+                    <div class="group relative aspect-video rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all duration-500 cursor-pointer">
+                        <img src="${thumb.image}" alt="${thumb.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <div class="translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                <span class="inline-block px-2 py-1 mb-2 bg-purple-600/80 backdrop-blur-sm text-xs font-semibold rounded text-white uppercase tracking-wider">
+                                    ${thumb.category}
+                                </span>
+                                <h3 class="text-xl font-bold text-white shadow-sm">${thumb.title}</h3>
+                            </div>
+                        </div>
+                        ${isAdmin ? `
+                        <button data-id="${thumb.id}" class="delete-thumb-btn absolute top-4 right-4 p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm z-10">
+                            <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
+                        </button>
+                        ` : ''}
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+        };
+
+        const updateAdminCategorySelect = () => {
+            const defaultOpt = `<option value="" disabled selected>Selecione uma categoria...</option>`;
+            const options = categories.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
+            dom.selectCategory.innerHTML = defaultOpt + options;
+            if (categories.length === 0) dom.noCatWarning.classList.remove('hidden');
+            else dom.noCatWarning.classList.add('hidden');
+            validateUploadForm();
+        };
+
+        const renderAdminCategoryList = () => {
+            if (categories.length === 0) {
+                dom.adminCategoryList.innerHTML = '';
+                dom.emptyCategoriesMsg.classList.remove('hidden');
+            } else {
+                dom.emptyCategoriesMsg.classList.add('hidden');
+                dom.adminCategoryList.innerHTML = categories.map(cat => `
+                    <li class="flex items-center justify-between p-2 hover:bg-zinc-900 rounded-md group">
+                        <span class="flex items-center gap-2 text-sm text-zinc-300">
+                            <i data-lucide="tag" class="w-4 h-4 text-zinc-500"></i> ${cat.name}
+                        </span>
+                        <button data-id="${cat.id}" class="delete-cat-btn text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all" title="Deletar categoria">
+                            <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
+                        </button>
+                    </li>
+                `).join('');
+                lucide.createIcons();
+            }
+        };
+
+        const switchAdminTab = (tab) => {
+            adminTab = tab;
+            if (tab === 'upload') {
+                dom.tabUpload.className = "flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-zinc-800 text-white";
+                dom.tabFilters.className = "flex-1 py-2 text-sm font-medium rounded-md transition-colors text-zinc-500 hover:text-zinc-300";
+                dom.formUpload.classList.remove('hidden');
+                dom.formFilters.classList.add('hidden');
+            } else {
+                dom.tabFilters.className = "flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-zinc-800 text-white";
+                dom.tabUpload.className = "flex-1 py-2 text-sm font-medium rounded-md transition-colors text-zinc-500 hover:text-zinc-300";
+                dom.formFilters.classList.remove('hidden');
+                dom.formUpload.classList.add('hidden');
+            }
+        };
+
+        const toggleModal = (show) => {
+            if (show) {
+                dom.modal.classList.remove('hidden');
+                if (isAdmin) {
+                    dom.viewLogin.classList.add('hidden');
+                    dom.viewDashboard.classList.remove('hidden');
+                    dom.viewDashboard.classList.add('flex');
+                } else {
+                    dom.viewDashboard.classList.add('hidden');
+                    dom.viewDashboard.classList.remove('flex');
+                    dom.viewLogin.classList.remove('hidden');
+                    dom.inputPassword.value = '';
+                    dom.loginError.classList.add('hidden');
+                }
+            } else {
+                dom.modal.classList.add('hidden');
+            }
+        };
+
+        const validateUploadForm = () => {
+            const hasTitle = dom.inputTitle.value.trim().length > 0;
+            const hasCat = dom.selectCategory.value !== "";
+            const hasImg = newImageBase64 !== '';
+            dom.btnSaveThumb.disabled = !(hasTitle && hasCat && hasImg) || isUploading;
+        };
+
+        const setupEventListeners = () => {
+            dom.langBtn.addEventListener('click', () => {
+                currentLang = currentLang === 'pt' ? 'en' : 'pt';
+                updateTranslations();
+            });
+
+            dom.adminToggleBtn.addEventListener('click', () => toggleModal(true));
+            dom.closeModalBtn.addEventListener('click', () => toggleModal(false));
+
+            dom.formLogin.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (dom.inputPassword.value === 'admin123') {
+                    isAdmin = true;
+                    toggleModal(true);
+                    renderGallery();
+                    dom.adminToggleBtn.innerHTML = '<i data-lucide="unlock" class="w-4 h-4"></i>';
+                    lucide.createIcons();
+                } else {
+                    dom.loginError.innerText = dict[currentLang].wrongPassword;
+                    dom.loginError.classList.remove('hidden');
+                }
+            });
+
+            dom.btnLogout.addEventListener('click', () => {
+                isAdmin = false;
+                toggleModal(false);
+                renderGallery();
+                dom.adminToggleBtn.innerHTML = '<i data-lucide="lock" class="w-4 h-4"></i>';
+                lucide.createIcons();
+            });
+
+            dom.tabUpload.addEventListener('click', () => switchAdminTab('upload'));
+            dom.tabFilters.addEventListener('click', () => switchAdminTab('filters'));
+
+            dom.inputFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800;
+                        let scaleSize = 1;
+                        if (img.width > MAX_WIDTH) scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = img.width * scaleSize;
+                        canvas.height = img.height * scaleSize;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        newImageBase64 = canvas.toDataURL('image/webp', 0.6);
+                        dom.imagePreview.src = newImageBase64;
+                        dom.imagePreview.classList.remove('hidden');
+                        dom.imagePlaceholder.classList.add('hidden');
+                        validateUploadForm();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            dom.inputTitle.addEventListener('input', validateUploadForm);
+            dom.selectCategory.addEventListener('change', validateUploadForm);
+
+            dom.formUpload.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!newImageBase64 || !dom.inputTitle.value || !dom.selectCategory.value) return;
+                isUploading = true;
+                validateUploadForm();
+                const originalBtnContent = dom.btnSaveThumb.innerHTML;
+                dom.btnSaveThumb.innerHTML = `<span>${dict[currentLang].saving}</span>`;
+                try {
+                    const thumbsRef = collection(db, 'artifacts', appId, 'public', 'data', 'thumbnails');
+                    await addDoc(thumbsRef, {
+                        title: dom.inputTitle.value.trim(),
+                        category: dom.selectCategory.value,
+                        image: newImageBase64,
+                        createdAt: Date.now()
+                    });
+                    dom.inputTitle.value = '';
+                    dom.selectCategory.value = '';
+                    newImageBase64 = '';
+                    dom.imagePreview.classList.add('hidden');
+                    dom.imagePlaceholder.classList.remove('hidden');
+                    dom.inputFile.value = '';
+                    toggleModal(false);
+                } catch (err) {
+                    console.error("Error adding thumbnail", err);
+                } finally {
+                    isUploading = false;
+                    dom.btnSaveThumb.innerHTML = originalBtnContent;
+                    validateUploadForm();
+                }
+            });
+
+            // CORREÇÃO: Listener para salvar categoria
+            dom.formAddCategory.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const catName = dom.inputCategory.value.trim();
+                if (!catName) return;
+                try {
+                    const catRef = collection(db, 'artifacts', appId, 'public', 'data', 'categories');
+                    await addDoc(catRef, { name: catName, createdAt: Date.now() });
+                    dom.inputCategory.value = '';
+                } catch (err) {
+                    console.error("Error adding category", err);
+                }
+            });
+
+            dom.galleryContainer.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.delete-thumb-btn');
+                if (!btn) return;
+                e.stopPropagation();
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'thumbnails', btn.dataset.id));
+                } catch (err) {
+                    console.error("Error deleting thumbnail", err);
+                }
+            });
+
+            dom.adminCategoryList.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.delete-cat-btn');
+                if (!btn) return;
+                e.stopPropagation();
+                try {
+                    const catId = btn.dataset.id;
+                    const catToDelete = categories.find(c => c.id === catId);
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'categories', catId));
+                    if (activeFilter !== 'all' && catToDelete && catToDelete.name === activeFilter) {
+                        activeFilter = 'all';
+                        renderFilters();
+                        renderGallery();
+                    }
+                } catch (err) {
+                    console.error("Error deleting category", err);
+                }
+            });
+        };
+
+    </script>
+</body>
+</html>
