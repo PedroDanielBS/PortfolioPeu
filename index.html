@@ -176,13 +176,15 @@
                     Precisa de thumbnails profissionais que chamam a atenção do seu público e aumentam o seu CTR? Entre em contato agora e vamos discutir o seu projeto!
                 </p>
                 <div class="cta-btn-anim flex flex-wrap justify-center md:justify-start gap-4">
-                    <a href="https://discordapp.com/users/472578101478686731" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full font-medium hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(147,51,234,0.3)]">
+                    <button id="btn-copy-discord" class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full font-medium hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(147,51,234,0.3)] relative group/tooltip" title="Clique para copiar o nick do Discord">
                         <!-- Custom Discord Logo SVG -->
                         <svg class="w-5 h-5 fill-current" viewBox="0 0 127.14 96.36" xmlns="http://www.w3.org/2000/svg">
                             <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,52.88,6.83,77.19,77.19,0,0,0,49.58,0,105.15,105.15,0,0,0,19.14,8.07C3,32.22-1.42,55.77,1,79a105.77,105.77,0,0,0,32,16.15,77.7,77.7,0,0,0,6.77-11,68.56,68.56,0,0,1-10.74-5.12c.91-.66,1.8-1.34,2.65-2a75.58,75.58,0,0,0,64,0c.85.71,1.74,1.39,2.65,2a68.56,68.56,0,0,1-10.74,5.12,77.7,77.7,0,0,0,6.77,11,105.77,105.77,0,0,0,32-16.15C129.35,55.77,124.62,32.22,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/>
                         </svg>
-                        <span>Discord</span>
-                    </a>
+                        <span>peuzadaxx</span>
+                        <!-- Tooltip -->
+                        <span id="discord-tooltip" class="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-zinc-800 text-xs text-white rounded-lg opacity-0 pointer-events-none transition-all duration-300 whitespace-nowrap border border-zinc-700 shadow-md">Copiado!</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -792,6 +794,24 @@
                     console.error("Error deleting category", err);
                 }
             });
+
+            // Discord Copy Nickname logic
+            const btnCopyDiscord = document.getElementById('btn-copy-discord');
+            const discordTooltip = document.getElementById('discord-tooltip');
+            if (btnCopyDiscord && discordTooltip) {
+                btnCopyDiscord.addEventListener('click', () => {
+                    navigator.clipboard.writeText('peuzadaxx').then(() => {
+                        discordTooltip.classList.remove('opacity-0', 'pointer-events-none');
+                        discordTooltip.classList.add('opacity-100');
+                        setTimeout(() => {
+                            discordTooltip.classList.remove('opacity-100');
+                            discordTooltip.classList.add('opacity-0', 'pointer-events-none');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Error copying text: ', err);
+                    });
+                });
+            }
         };
 
     </script>
